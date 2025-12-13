@@ -16,9 +16,9 @@ MNk8KNH3Usiio41PRUEoDFPqfxLPlSmx
 To solve, I learned that the Linux shell treats spaces as separators between different commands or arguments. 
 To treat a filename with spaces as a single item, you have three main methods:
 
-* **Quotes:** Wrap the name in quotes so the shell reads it as one string.
+* **Quotes:** Wrap the name in quotes so the shell reads it as one string. e.g.
   `cat "spaces in this filename"`
-* **Backslashes (`\`):** "Escape" each space to tell the shell it is part of the name.
+* **Backslashes (`\`):** "Escape" each space to tell the shell it is part of the name. e.g.
   `cat spaces\ in\ this\ filename`
 * **Tab Completion:** Type `cat` and the first few letters, then press **Tab**. The shell will automatically add the backslashes for you.
 
