@@ -17,9 +17,9 @@ To solve, I learned that the Linux shell treats spaces as separators between dif
 To treat a filename with spaces as a single item, you have three main methods:
 
 * **Quotes:** Wrap the name in quotes so the shell reads it as one string.
-    * `cat "spaces in this filename"`
+  `cat "spaces in this filename"`
 * **Backslashes (`\`):** "Escape" each space to tell the shell it is part of the name.
-    * `cat spaces\ in\ this\ filename`
+  `cat spaces\ in\ this\ filename`
 * **Tab Completion:** Type `cat` and the first few letters, then press **Tab**. The shell will automatically add the backslashes for you.
 
 The `./` represents the current directory. Using it (`cat ./filename`) explicitly tells the system to look for the file in your active folder. 
