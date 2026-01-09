@@ -1,0 +1,83 @@
+# Used for generating unique digital fingerprints (hashes)
+import hashlib  
+# Used to record the exact moment a block is created
+import time     
+
+class Block:
+    """
+    The Block class represents a single unit of data in the chain.
+    """
+    def __init__(self, index, data, previous_hash):
+    #position, time, information(transaction), previous block hash, this block hash
+    # each block has a unique hash
+        self.index = index              
+        self.timestamp = time.time()    
+        self.data = data               
+        self.previous_hash = previous_hash  
+        self.hash = self.calculate_hash()   
+
+    def calculate_hash(self):
+        """
+        Creates a SHA-256 hash by combining all block attributes into a single string.
+        If even one character in the data changes, the resulting hash changes entirely.
+        """
+        # Combine data into a string format
+        block_content = f"{self.index}{self.timestamp}{self.data}{self.previous_hash}"
+        
+        # .encode() converts the string to bytes for hashing
+        # .hexdigest() converts the resulting hash into a readable hexadecimal string
+        return hashlib.sha256(block_content.encode()).hexdigest()
+
+class Blockchain:
+    """
+    The Blockchain class manages the list of blocks and ensures they stay linked.
+    """
+    def __init__(self):
+        # When a blockchain is initialized, we must manually create the first block
+        self.chain = [self.create_genesis_block()]
+
+    def create_genesis_block(self):
+        """
+        The 'Genesis Block' is the very first block in a blockchain. 
+        It has no 'previous_hash' because nothing comes before it.
+        """
+        return Block(0, "Genesis Block", "0")
+
+    def get_latest_block(self):
+        """
+        A helper method to retrieve the most recent block added to the list.
+        """
+        return self.chain[-1]
+
+    def add_block(self, new_data):
+        """
+        Creates a new block using the hash of the latest block to link them together.
+        """
+        # 1. Find the current 'tail' of the chain
+        previous_block = self.get_latest_block()
+        
+        # 2. Create the new block, passing the previous block's hash as a parameter
+        new_block = Block(len(self.chain), new_data, previous_block.hash)
+        
+        # 3. Add the new block to the list, effectively 'chaining' it
+        self.chain.append(new_block)
+
+# --- Execution Section ---
+
+# Initialize a new blockchain instance
+my_coin = Blockchain()
+
+# Add new "transactions" to the chain
+print("Adding block 1...")
+my_coin.add_block({"sender": "Alice", "receiver": "Bob", "amount": 50})
+
+print("Adding block 2...")
+my_coin.add_block({"sender": "Bob", "receiver": "Charlie", "amount": 25})
+
+# Loop through the chain and print the details of each block
+for block in my_coin.chain:
+    print("-" * 30)
+    print(f"Block Index:   {block.index}")
+    print(f"Data:          {block.data}")
+    print(f"Previous Hash: {block.previous_hash}")
+    print(f"Current Hash:  {block.hash}")
