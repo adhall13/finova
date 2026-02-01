@@ -416,6 +416,29 @@ bandit17@bandit:~$ diff passwords.old passwords.new
 ```
 
 ## Theory Concepts
+Concept: File Forensics and identifying the "delta" (change) between two sets of data.
+
+1. The `diff` Utility: The `diff` command is the standard tool for line-by-line comparison. It ignores everything that matches and only highlights the discrepancies.
+* **`<` Symbol:** Shows content only found in the *first* file.
+* **`>` Symbol:** Shows content only found in the *second* file.
+
+2. File Integrity Monitoring (FIM): This level simulates a real-world security practice. System admins use tools like `diff` to ensure that critical files (like password lists or system configurations) haven't been altered by unauthorized users. If a comparison shows a change that wasn't expected, it's a red flag for a potential breach.
+
+3. Side-by-Side Comparison (`diff -y`): Instead of showing a list of changes, the `-y` flag splits your terminal into two columns.
+* **Identical lines** appear side-by-side.
+* **Modified lines** are marked with a `|`.
+* **Unique lines** (the ones you are looking for) are marked with `<` or `>`.
+
+4. The Unified Format (`diff -u`): While `-y` is great for humans, the `-u` (Unified) flag is the industry standard for **patches**. It shows the changes in a compact format with "context lines" around the difference.
+
+* **`-` lines:** Content removed from the original.
+* **`+` lines:** Content added to the new version.
+
+> note:
+> `-y` side-by-side = visually scanning two files manually
+> `-u` unified = creating "patch" files for software updates
+> `-w` ignore whitespace = finding changes when the only difference is tabs or spaces
+
 
 # Bandit Level 18 → Level 19
 
@@ -440,6 +463,18 @@ IueksS7Ubh8G3DCwVzrTd8rAVOwq3M5x
 ```
 
 ## Theory Concepts
+Concept: Bypassing Environment Restrictions**. It teaches ya forced logout can often be avoided by changing how you initiate the connection.
+
+1. The Forced Logout Trap: In Linux, certain files like `.bashrc` or `.profile` execute automatically the moment you log in. If an admin places an `exit` command in these files, effectively locking them out of an interactive session, the system kicks the user out before a command can be typed.
+
+2. Remote Command Execution: SSH allows to bypass the standard login process by passing a command directly. Instead of asking for a shell, ask for a specific result.
+* **The Logic:** You tell SSH, "Don't give me a terminal; just run `cat readme` and show me what happens."
+* **The Outcome:** The server executes that single command and sends the text back to your screen, often finishing the task before the restrictive "logout" script can trigger.
+
+3. Interactive vs. Non-Interactive
+* **Interactive:** Want to "stay" on the server and work (blocked in this level).
+* **Non-Interactive:** Want the server to do one specific thing and report back (the solution for this level).
+
 
 # Bandit Level 19 → Level 20
 
@@ -471,16 +506,34 @@ GbKksEFF4yrVs6il55v6gwY5aVje5f0j
 ```
 
 ## Theory Concepts
+Concept: Privilege Escalation through a special Linux permission called the **SetUID bit**.
+
+1. The SetUID Bit (Set User ID): In Linux, programs usually run with the permissions of the person who started them. However, if a file has the **SetUID bit** enabled, it runs with the permissions of the **file owner**.
+
+* **The "s" Bit:** Identify these files by looking for an `s` in the permission string (e.g., `-rwsr-xr-x`).
+* **The Power:** This allows a low-privileged user to perform a task that usually requires higher permissions.
+
+2. Privilege Escalation: This is a fundamental security concept where an attacker (or researcher) finds a way to "step up" their authority. In this case:
+
+* You are **bandit19**.
+* The password file for the next level is only readable by **bandit20**.
+* There is a "wrapper" tool owned by **bandit20** with the SetUID bit set.
+* By running that tool; effectively "borrow" bandit20's identity to access the file.
+
+3. The "Wrapper" Logic: The binary provided acts as a middleman. It is programmed to execute whatever command you give it, but it does so using the authority of its owner.
+
+* **The Command:** Use the wrapper to run `cat /etc/bandit_pass/bandit20`.
+* **The Result:** Because the wrapper "is" bandit20 in the eyes of the system, it is allowed to read the file and print the password to the screen.
+
 
 # Bandit Level 20 → Level 21
+
+## Level Goal 
 There is a setuid binary in the homedirectory that does the following: it makes a connection to localhost on the port you specify as a commandline argument. It then reads a line of text from the connection and compares it to the password in the previous level (bandit20). If the password is correct, it will transmit the password for the next level (bandit21).
 
 NOTE: Try connecting to your own network daemon to see if it works as you think
 
 Commands you may need to solve this level: ssh, nc, cat, bash, screen, tmux, Unix ‘job control’ (bg, fg, jobs, &, CTRL-Z, …)
-
-## Level Goal 
-
 
 ## Solve
 ```
@@ -494,6 +547,19 @@ gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr
 ```
 
 ## Theory Concepts
+Concept: Inter-Process Communication (IPC) - through local network sockets, requiring a coordinated "handshake" between two separate programs.
+
+1. Local Network Sockets: Sockets are endpoints for communication between processes. Even on a single machine, programs can "talk" to each other by treating the internal network (localhost) as a bridge. This interaction requires one process to act as a **Server** and the other as a **Client**.
+
+2. The Listener-Connector Model: The challenge involves a Request-Response cycle.
+* **The Listener:** A utility (like `nc`) is configured to sit in a "Listen" state on a specific port, holding the current level's password as a payload.
+* **The Connector:** A SetUID binary is executed to find and connect to that specific port.
+* **The Exchange:** Upon connection, the binary reads the password from the listener. If the data is correct, the binary transmits the next level's password back through the same connection.
+
+3. Asynchronous Execution (Backgrounding): Since a terminal typically only handles one foreground task at a time, **Backgrounding** is used to manage multiple processes. By appending the `&` symbol to a command, the shell is instructed to run the task in the background. This allows the listener to remain active and waiting while the connector binary is launched in the same session.
+
+4. Privilege Verification: The connector binary uses its **SetUID** status to access restricted data. It acts as the "judge," verifying that the string provided by the listener matches the authorized password for the current level before releasing the new credentials.
+
 
 # Bandit Level 21 → Level 22
 
@@ -527,6 +593,31 @@ Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI
 ```
 
 ## Theory Concepts
+This level introduces **System Automation** and the exploitation of **Scheduled Tasks** to retrieve credentials.
+
+1. The Cron Daemon: The **cron** service is a background process in Linux that executes commands or scripts at predefined intervals. It is essential for routine system maintenance, such as log rotation or clearing temporary directories.
+
+* **The Crontab:** Schedules are defined in "cron tables." These files specify the timing (minute, hour, day) and the specific command to be executed.
+* **The Opportunity:** Scheduled tasks often run with the permissions of the user who created them. If a task is scheduled by a higher-privileged user, it may inadvertently leave behind data that lower-privileged users can access.
+
+2. Service Discovery in `/etc/cron.d/`: System-wide cron jobs are typically stored in `/etc/cron.d/`. By examining the configuration files within this directory, the following can be determined:
+
+* Which scripts are active.
+* How frequently the scripts execute.
+* Which user (e.g., `bandit22`) is running the script.
+
+3. Script Logic and Data Redirection: Scheduled tasks frequently involve shell scripts that automate a series of commands.
+
+* **The Mechanism:** A script might be programmed to read a password file and redirect that content into a temporary file.
+* **Analysis:** By reading the contents of the script, the exact destination of the output can be identified. This allows for the retrieval of the credentials from a secondary location (such as `/tmp`) where the data has been temporarily stored by the automated process.
+
+4. Summary of the Workflow
+
+i. **Locate** = Inspect `/etc/cron.d/` - Find the scheduled task for the next user. 
+ii. **Identify** = Read the cron configuration - Determine which script is being executed. 
+iii. **Analyze** = Read the shell script - Find the output path where the password is saved. 
+iv. **Retrieve** = Access the output file - Obtain the credentials for the next level. 
+
 
 # Bandit Level 22 → Level 23
 
@@ -570,5 +661,18 @@ jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
 ```
 
 ## Theory Concepts
+This level centers on **Predictive Analysis** and the reverse-engineering of shell scripts that use **Deterministic Hashing**.
 
+1. Script Logic Emulation: In this scenario, a scheduled task (cron job) executes a script that generates a password file in a hidden location. Unlike previous levels, where the path was static, this script generates the filename dynamically based on the current username. To find the password for the next level, the logic applied to the target username (`bandit23`) must be manually replicated.
 
+2. Deterministic Hashing (MD5): The script utilises the **MD5 (Message Digest 5)** algorithm to transform a username into a unique string.
+
+* **The Concept:** Hashing is a one-way mathematical function.
+* **Determinism:** Because the process is deterministic, providing the same input string will always result in the same output hash.
+* **The Vulnerability:** Since the hashing method is visible in the script, the "secret" filename is not actually secret; it is a predictable value that can be pre-calculated by anyone with access to the script's code.
+
+3. Command Substitution and Variables: The script relies on shell variables and command substitution to function.
+
+* **Variable Expansion:** The script uses `$myname` or `$USER` to capture the identity of the user running it.
+* **Command Pipelines:** By piping the username through `echo`, `md5sum`, and `cut`, the script strips away unnecessary data to produce a clean, alphanumeric filename.
+* **Replication:** By executing these exact commands in the terminal using "bandit23" as the input string, the resulting hash reveals the name of the file currently sitting in the `/tmp` directory.
