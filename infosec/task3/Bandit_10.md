@@ -27,3 +27,4 @@ y =1
 ## What I learnt
 * I learned how to use the `strings` command to extract sequences of printable characters from a binary file, effectively filtering out the data that usually crashes a terminal.
 * I used `grep` to search for patterns within those extracted strings, specifically looking for the "=" prefix to pinpoint the exact location of the password.
+ 
