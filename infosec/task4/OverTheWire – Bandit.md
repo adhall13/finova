@@ -220,7 +220,15 @@ Helpful Reading Material: SSH/OpenSSH/Keys
 
 ## Solve
 ```
-
+bandit13@bandit:~$ ls
+sshkey.private
+bandit13@bandit:~$ exit
+logout
+Connection to bandit.labs.overthewire.org closed.
+scp -P 2220 bandit13@bandit.labs.overthewire.org:sshkey.private .         
+bandit13@bandit.labs.overthewire.org's password: 
+sshkey.private
+ssh -i sshkey.private bandit14@bandit.labs.overthewire.org -p 2220
 ```
 
 ## Theory Concepts
@@ -253,6 +261,12 @@ Port (computer networking) on Wikipedia
 
 ## Solve
 ```
+bandit14@bandit:~$ cat /etc/bandit_pass/bandit14
+4wcYUJFw0k0XLShlDzztnTBHiqxU3b3e
+bandit14@bandit:~$ nc localhost 30000
+4wcYUJFw0k0XLShlDzztnTBHiqxU3b3e
+Correct!
+BfMYroe26WYalil77FoDi9qh59eK5xNr
 ```
 
 ## Theory Concepts
@@ -291,6 +305,11 @@ OpenSSL Cookbook - Testing with OpenSSL
 
 ## Solve
 ```
+bandit15@bandit:~$ openssl s_client -connect localhost:30001
+...
+BfMYroe26WYalil77FoDi9qh59eK5xNr
+Correct!
+cluFn7wTiGryunymYOu4RcffSxQluehd
 ```
 
 ## Theory Concepts
@@ -318,6 +337,48 @@ Helpful Reading Material: Port scanner on Wikipedia
 
 ## Solve
 ```
+bandit16@bandit:~$ nmap -sV localhost -p 31000-32000
+Starting Nmap 7.40 ( https://nmap.org ) at 2021-06-12 16:17 CEST
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.00026s latency).
+Not shown: 996 closed ports
+PORT      STATE SERVICE     VERSION
+31046/tcp open  echo
+31518/tcp open  ssl/echo
+31691/tcp open  echo
+31790/tcp open  ssl/unknown
+31960/tcp open  echo
+bandit15@bandit:~$ openssl s_client -connect localhost:31790
+...
+cluFn7wTiGryunymYOu4RcffSxQluehd
+Correct!
+-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAvmOkuifmMg6HL2YPIOjon6iWfbp7c3jx34YkYWqUH57SUdyJ
+imZzeyGC0gtZPGujUSxiJSWI/oTqexh+cAMTSMlOJf7+BrJObArnxd9Y7YT2bRPQ
+Ja6Lzb558YW3FZl87ORiO+rW4LCDCNd2lUvLE/GL2GWyuKN0K5iCd5TbtJzEkQTu
+DSt2mcNn4rhAL+JFr56o4T6z8WWAW18BR6yGrMq7Q/kALHYW3OekePQAzL0VUYbW
+JGTi65CxbCnzc/w4+mqQyvmzpWtMAzJTzAzQxNbkR2MBGySxDLrjg0LWN6sK7wNX
+x0YVztz/zbIkPjfkU1jHS+9EbVNj+D1XFOJuaQIDAQABAoIBABagpxpM1aoLWfvD
+KHcj10nqcoBc4oE11aFYQwik7xfW+24pRNuDE6SFthOar69jp5RlLwD1NhPx3iBl
+J9nOM8OJ0VToum43UOS8YxF8WwhXriYGnc1sskbwpXOUDc9uX4+UESzH22P29ovd
+d8WErY0gPxun8pbJLmxkAtWNhpMvfe0050vk9TL5wqbu9AlbssgTcCXkMQnPw9nC
+YNN6DDP2lbcBrvgT9YCNL6C+ZKufD52yOQ9qOkwFTEQpjtF4uNtJom+asvlpmS8A
+vLY9r60wYSvmZhNqBUrj7lyCtXMIu1kkd4w7F77k+DjHoAXyxcUp1DGL51sOmama
++TOWWgECgYEA8JtPxP0GRJ+IQkX262jM3dEIkza8ky5moIwUqYdsx0NxHgRRhORT
+8c8hAuRBb2G82so8vUHk/fur85OEfc9TncnCY2crpoqsghifKLxrLgtT+qDpfZnx
+SatLdt8GfQ85yA7hnWWJ2MxF3NaeSDm75Lsm+tBbAiyc9P2jGRNtMSkCgYEAypHd
+HCctNi/FwjulhttFx/rHYKhLidZDFYeiE/v45bN4yFm8x7R/b0iE7KaszX+Exdvt
+SghaTdcG0Knyw1bpJVyusavPzpaJMjdJ6tcFhVAbAjm7enCIvGCSx+X3l5SiWg0A
+R57hJglezIiVjv3aGwHwvlZvtszK6zV6oXFAu0ECgYAbjo46T4hyP5tJi93V5HDi
+Ttiek7xRVxUl+iU7rWkGAXFpMLFteQEsRr7PJ/lemmEY5eTDAFMLy9FL2m9oQWCg
+R8VdwSk8r9FGLS+9aKcV5PI/WEKlwgXinB3OhYimtiG2Cg5JCqIZFHxD6MjEGOiu
+L8ktHMPvodBwNsSBULpG0QKBgBAplTfC1HOnWiMGOU3KPwYWt0O6CdTkmJOmL8Ni
+blh9elyZ9FsGxsgtRBXRsqXuz7wtsQAgLHxbdLq/ZJQ7YfzOKU4ZxEnabvXnvWkU
+YOdjHdSOoKvDQNWu6ucyLRAWFuISeXw9a/9p7ftpxm0TSgyvmfLF2MIAEwyzRqaM
+77pBAoGAMmjmIJdjp+Ez8duyn3ieo36yrttF5NSsJLAbxFpdlc1gvtGCWW+9Cq0b
+dxviW8+TFVEBl1O4f7HVm6EpTscdDxU+bCXWkfjuRb7Dy9GOtt9JPsX8MBTakzh3
+vBgsyi/sN3RqRBcGU40fOoZyfAMT8s1m/uYv52O6IgeuZ/ujbjY=
+-----END RSA PRIVATE KEY-----
 ```
 
 ## Theory Concepts
@@ -347,6 +408,11 @@ Commands you may need to solve this level: cat, grep, ls, diff
 
 ## Solve
 ```
+bandit17@bandit:~$ diff passwords.old passwords.new 
+42c42
+< w0Yfolrc5bwjS4qw5mq1nnQi6mF03bii
+---
+> kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd
 ```
 
 ## Theory Concepts
@@ -360,6 +426,17 @@ Commands you may need to solve this level: ssh, ls, cat
 
 ## Solve
 ```
+ssh bandit18@bandit.labs.overthewire.org -p 2220 ls         
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit18@bandit.labs.overthewire.org's password: 
+readme
+
+ssh bandit18@bandit.labs.overthewire.org -p 2220 cat readme 
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit18@bandit.labs.overthewire.org's password: 
+IueksS7Ubh8G3DCwVzrTd8rAVOwq3M5x
 ```
 
 ## Theory Concepts
@@ -373,6 +450,24 @@ Helpful Reading Material: setuid on Wikipedia
 
 ## Solve
 ```
+bandit19@bandit:~$ ls -la
+total 28
+drwxr-xr-x  2 root     root     4096 May  7  2020 .
+drwxr-xr-x 41 root     root     4096 May  7  2020 ..
+-rwsr-x---  1 bandit20 bandit19 7296 May  7  2020 bandit20-do
+-rw-r--r--  1 root     root      220 May 15  2017 .bash_logout
+-rw-r--r--  1 root     root     3526 May 15  2017 .bashrc
+-rw-r--r--  1 root     root      675 May 15  2017 .profile
+bandit19@bandit:~$ ./bandit20-do 
+Run a command as another user.
+  Example: ./bandit20-do id
+bandit19@bandit:~$ ./bandit20-do ls /etc/bandit_pass
+bandit0   bandit12  bandit16  bandit2   bandit23  bandit27  bandit30  bandit4  bandit8
+bandit1   bandit13  bandit17  bandit20  bandit24  bandit28  bandit31  bandit5  bandit9
+bandit10  bandit14  bandit18  bandit21  bandit25  bandit29  bandit32  bandit6
+bandit11  bandit15  bandit19  bandit22  bandit26  bandit3   bandit33  bandit7
+bandit19@bandit:~$ ./bandit20-do cat /etc/bandit_pass/bandit20
+GbKksEFF4yrVs6il55v6gwY5aVje5f0j
 ```
 
 ## Theory Concepts
@@ -389,6 +484,13 @@ Commands you may need to solve this level: ssh, nc, cat, bash, screen, tmux, Uni
 
 ## Solve
 ```
+bandit20@bandit:~$ echo -n 'GbKksEFF4yrVs6il55v6gwY5aVje5f0j' | nc -l -p 1234 &
+[1] 24661
+bandit20@bandit:~$ ./suconnect 1234
+Read: GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+Password matches, sending next password
+gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr
+[1]+  Done               
 ```
 
 ## Theory Concepts
@@ -402,6 +504,26 @@ Commands you may need to solve this level: cron, crontab, crontab(5) (use “man
 
 ## Solve
 ```
+bandit21@bandit:~$ ls -la /etc/cron.d
+total 36
+drwxr-xr-x  2 root root 4096 Jul 11  2020 .
+drwxr-xr-x 87 root root 4096 May 14  2020 ..
+-rw-r--r--  1 root root   62 May 14  2020 cronjob_bandit15_root
+-rw-r--r--  1 root root   62 Jul 11  2020 cronjob_bandit17_root
+-rw-r--r--  1 root root  120 May  7  2020 cronjob_bandit22
+-rw-r--r--  1 root root  122 May  7  2020 cronjob_bandit23
+-rw-r--r--  1 root root  120 May 14  2020 cronjob_bandit24
+-rw-r--r--  1 root root   62 May 14  2020 cronjob_bandit25_root
+-rw-r--r--  1 root root  102 Oct  7  2017 .placeholder
+bandit21@bandit:~$ cat /etc/cron.d/cronjob_bandit22
+@reboot bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+* * * * * bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+bandit21@bandit:~$ cat /usr/bin/cronjob_bandit22.sh
+#!/bin/bash
+chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+bandit21@bandit:~$ cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI
 ```
 
 ## Theory Concepts
@@ -417,6 +539,34 @@ Commands you may need to solve this level: cron, crontab, crontab(5) (use “man
 
 ## Solve
 ```
+bandit22@bandit:~$ ls -la /etc/cron.d
+total 36
+drwxr-xr-x  2 root root 4096 Jul 11  2020 .
+drwxr-xr-x 87 root root 4096 May 14  2020 ..
+-rw-r--r--  1 root root   62 May 14  2020 cronjob_bandit15_root
+-rw-r--r--  1 root root   62 Jul 11  2020 cronjob_bandit17_root
+-rw-r--r--  1 root root  120 May  7  2020 cronjob_bandit22
+-rw-r--r--  1 root root  122 May  7  2020 cronjob_bandit23
+-rw-r--r--  1 root root  120 May 14  2020 cronjob_bandit24
+-rw-r--r--  1 root root   62 May 14  2020 cronjob_bandit25_root
+-rw-r--r--  1 root root  102 Oct  7  2017 .placeholder
+bandit22@bandit:~$ cat /etc/cron.d/cronjob_bandit23
+@reboot bandit23 /usr/bin/cronjob_bandit23.sh  &> /dev/null
+* * * * * bandit23 /usr/bin/cronjob_bandit23.sh  &> /dev/null
+bandit22@bandit:~$ cat /usr/bin/cronjob_bandit23.sh
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+
+bandit22@bandit:~$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+8ca319486bfbbc3663ea0fbe81326349
+bandit22@bandit:~$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
 ```
 
 ## Theory Concepts
