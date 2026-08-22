@@ -1,0 +1,63 @@
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+# 1. Fetch Data (Reliance Industries for the last 12 months)
+ticker = "RELIANCE.NS"
+data = yf.download(ticker, period="1y")
+
+# 2. Calculate EMAs
+data['EMA_20'] = data['Close'].ewm(span=20, adjust=False).mean()
+data['EMA_50'] = data['Close'].ewm(span=50, adjust=False).mean()
+
+# 3. Generate Signals (1 for 20 > 50, 0 for 20 < 50)
+data['Signal'] = np.where(data['EMA_20'] > data['EMA_50'], 1, 0)
+# 'Position' will be 1 on the day the 20 EMA crosses above, and -1 when it crosses below
+data['Position'] = data['Signal'].diff()
+
+# 4. Log the Trades
+trades = []
+entry_price = 0
+entry_date = None
+
+for date, row in data.iterrows():
+    if row['Position'] == 1: # Entry Crossover
+        entry_price = row['Close']
+        entry_date = date
+    elif row['Position'] == -1 and entry_date is not None: # Exit Crossover
+        exit_price = row['Close']
+        pnl_pct = ((exit_price - entry_price) / entry_price) * 100
+        
+        trades.append({
+            'Entry Date': entry_date.strftime('%Y-%m-%d'),
+            'Entry Price': round(entry_price, 2),
+            'Exit Date': date.strftime('%Y-%m-%d'),
+            'Exit Price': round(exit_price, 2),
+            'P&L (%)': round(pnl_pct, 2)
+        })
+        entry_date = None # Reset for next trade
+
+# 5. Output Results
+trades_df = pd.DataFrame(trades)
+trades_df.index.name = 'Trade Number'
+trades_df.index += 1
+
+print("--- TRADE LOG ---")
+print(trades_df.to_string())
+
+# 6. Summary Statistics
+total_trades = len(trades_df)
+if total_trades > 0:
+    winners = len(trades_df[trades_df['P&L (%)'] > 0])
+    win_rate = (winners / total_trades) * 100
+    best_trade = trades_df['P&L (%)'].max()
+    worst_trade = trades_df['P&L (%)'].min()
+
+    print("\n--- SUMMARY ---")
+    print(f"Total Trades: {total_trades}")
+    print(f"Number of Winners: {winners}")
+    print(f"Win Rate: {win_rate:.1f}%")
+    print(f"Largest Single Winner: {best_trade:.2f}%")
+    print(f"Largest Single Loser: {worst_trade:.2f}%")
+else:
+    print("\nNo complete trades found in the last 12 months.")
